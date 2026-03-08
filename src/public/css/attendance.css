@@ -1,0 +1,129 @@
+.attendance-page {
+    min-height: calc(100vh - 80px);
+    background: #f0eff2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.attendance-page__inner {
+    width: 100%;
+    max-width: 760px;
+    text-align: center;
+}
+
+.attendance-page__status {
+    display: inline-block;
+    margin: 0 0 20px;
+    padding: 8px 18px;
+    border-radius: 9999px;
+    background: #d9d9d9;
+    color: #666666;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.attendance-page__date {
+    margin: 0 0 40px;
+    color: #000000;
+    font-size: 40px;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+.attendance-page__time {
+    margin: 0 0 100px;
+    color: #000000;
+    font-size: 82px;
+    font-weight: 700;
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+    line-height: 1;
+}
+
+.attendance-page__actions {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.attendance-page__actions form {
+    margin: 0;
+}
+
+.attendance-page__button {
+    min-width: 220px;
+    height: 70px;
+    padding: 0 32px;
+    border: none;
+    border-radius: 18px;
+    background: #000000;
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.attendance-page__button--secondary {
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #000000;
+}
+
+.attendance-page__button:hover {
+    opacity: 0.92;
+}
+
+.attendance-page__button:focus {
+    outline: none;
+}
+
+.attendance-page__message {
+    margin: 0;
+    color: #000000;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+@media screen and (max-width: 768px) {
+    .attendance-page {
+        min-height: calc(100vh - 70px);
+        padding: 32px 16px;
+    }
+
+    .attendance-page__status {
+        margin-bottom: 32px;
+        padding: 7px 16px;
+        font-size: 14px;
+    }
+
+    .attendance-page__date {
+        margin-bottom: 20px;
+        font-size: 30px;
+    }
+
+    .attendance-page__time {
+        margin-bottom: 42px;
+        font-size: 58px;
+    }
+
+    .attendance-page__actions {
+        gap: 16px;
+    }
+
+    .attendance-page__button {
+        min-width: 180px;
+        height: 58px;
+        font-size: 24px;
+    }
+
+    .attendance-page__message {
+        font-size: 20px;
+    }
+}

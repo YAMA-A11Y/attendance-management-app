@@ -20,6 +20,6 @@ class RegisterController extends Controller
 
         Auth::login($user);
 
-        return redirect('/');
+        return redirect()->route('attendance.index');
     }
 }
