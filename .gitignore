@@ -1,0 +1,16 @@
+# Laravel
+/vendor/
+/node_modules/
+.env
+
+/storage/*.log
+/storage/framework/
+/bootstrap/cache/
+
+# Docker
+docker/mysql/data/
+
+# OS
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
