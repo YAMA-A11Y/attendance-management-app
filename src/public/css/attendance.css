@@ -38,7 +38,7 @@
     color: #000000;
     font-size: 82px;
     font-weight: 700;
-    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    font-family: "Inter", "Noto Sans JP", sans-serif;
     font-variant-numeric: tabular-nums;
     letter-spacing: 1px;
     line-height: 1;
@@ -47,7 +47,7 @@
 .attendance-page__actions {
     display: flex;
     justify-content: center;
-    gap: 24px;
+    gap: 70px;
     flex-wrap: wrap;
 }
 
@@ -72,7 +72,6 @@
 .attendance-page__button--secondary {
     background: #ffffff;
     color: #000000;
-    border: 1px solid #000000;
 }
 
 .attendance-page__button:hover {
@@ -86,9 +85,10 @@
 .attendance-page__message {
     margin: 0;
     color: #000000;
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 700;
     line-height: 1.4;
+    letter-spacing: 4px;
 }
 
 @media screen and (max-width: 768px) {
