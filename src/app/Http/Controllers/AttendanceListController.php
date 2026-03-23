@@ -20,7 +20,7 @@ class AttendanceListController extends Controller
         $startOfMonth = $currentMonth->copy()->startOfMonth();
         $endOfMonth = $currentMonth->copy()->endOfMonth();
 
-        $attendanceCollection = Attendance::with('breakTimes')
+        $attendanceCollection = Attendance::with(['breakTimes', 'correctionRequests.breakTimes',])
             ->where('user_id', $user->id)
             ->whereBetween('work_date', [
                 $startOfMonth->toDateString(),
@@ -40,42 +40,70 @@ class AttendanceListController extends Controller
             $dateKey = $currentDate->format('Y-m-d');
             $attendance = $attendanceCollection->get($dateKey);
 
-            $breakDurationSeconds = 0;
-            $workDurationSeconds = 0;
+            $pendingCorrectionRequest = null;
+
+            if ($attendance) {
+                $pendingCorrectionRequest = $attendance->correctionRequests
+                    ->where('status', 'pending')
+                    ->sortByDesc('created_at')
+                    ->first();
+            }
+
+            $displayClockInAt = $pendingCorrectionRequest && $pendingCorrectionRequest->requested_clock_in_at ? Carbon::parse($pendingCorrectionRequest->requested_clock_in_at)->format('H:i') : ($attendance && $attendance->clock_in_at ? Carbon::parse($attendance->clock_in_at)->format('H:i') : null);
+
+            $displayClockOutAt = $pendingCorrectionRequest && $pendingCorrectionRequest->requested_clock_out_at ? Carbon::parse($pendingCorrectionRequest->requested_clock_out_at)->format('H:i') : ($attendance && $attendance->clock_out_at ? Carbon::parse($attendance->clock_out_at)->format('H:i') : null);
+
+            $breakDurationMinutes = 0;
+            $workDurationMinutes = 0;
 
             if ($attendance) {
 
-                foreach ($attendance->breakTimes as $break) {
+                $displayBreakTimes = $pendingCorrectionRequest ? $pendingCorrectionRequest->breakTimes : $attendance->breakTimes;
+
+                foreach ($displayBreakTimes as $break) {
 
                     if ($break->break_start_at && $break->break_end_at) {
 
-                        $breakDurationSeconds += Carbon::parse($break->break_start_at)
-                            ->diffInSeconds(Carbon::parse($break->break_end_at));
+                        $breakStart = Carbon::createFromFormat(
+                            'H:i',
+                            Carbon::parse($break->break_start_at)->format('H:i')
+                        );
+
+                        $breakEnd = Carbon::createFromFormat(
+                            'H:i',
+                            Carbon::parse($break->break_end_at)->format('H:i')
+                        );
+
+                        $breakDurationMinutes += $breakStart->diffInMinutes($breakEnd);
                     }
-                }
+                }                
 
-                if ($attendance->clock_in_at && $attendance->clock_out_at) {
+                if ($displayClockInAt && $displayClockOutAt) {
 
-                    $totalSeconds = Carbon::parse($attendance->clock_in_at)
-                        ->diffInSeconds(Carbon::parse($attendance->clock_out_at));
-                        
-                    $workDurationSeconds = $totalSeconds - $breakDurationSeconds;
+                    $clockIn = Carbon::createFromFormat(
+                        'H:i', $displayClockInAt);
+
+                    $clockOut = Carbon::createFromFormat(
+                        'H:i',$displayClockOutAt);
+
+                    $totalMinutes = $clockIn->diffInMinutes($clockOut);
+
+                    $workDurationMinutes = $totalMinutes - $breakDurationMinutes;
                 }
             }
 
             $attendanceList[] = [
-
                 'date' => $currentDate->copy(),
 
                 'attendance_id' => $attendance ? $attendance->id : null,
 
-                'clock_in_at' => $attendance && $attendance->clock_in_at ? Carbon::parse($attendance->clock_in_at)->format('H:i') : '',
+                'clock_in_at' => $displayClockInAt ?? '',
 
-                'clock_out_at' => $attendance && $attendance->clock_out_at ? Carbon::parse($attendance->clock_out_at)->format('H:i') : '',
+                'clock_out_at' => $displayClockOutAt ?? '',
 
-                'break_duration' => $breakDurationSeconds > 0 ? gmdate('H:i', $breakDurationSeconds) : '',
+                'break_duration' => $breakDurationMinutes > 0 ? sprintf('%02d:%02d', floor($breakDurationMinutes / 60), $breakDurationMinutes % 60) : '',
 
-                'work_duration' => $workDurationSeconds > 0 ? gmdate('H:i', $workDurationSeconds) : '',
+                'work_duration' => $workDurationMinutes > 0 ? sprintf('%02d:%02d', floor($workDurationMinutes / 60), $workDurationMinutes % 60) : '',
             ];
 
             $currentDate->addDay();

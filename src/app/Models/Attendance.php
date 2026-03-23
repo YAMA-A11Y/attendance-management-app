@@ -42,4 +42,9 @@ class Attendance extends Model
     {
         return $this->hasOne(BreakTime::class)->whereNull('break_end_at');
     }
+
+    public function correctionRequests()
+    {
+        return $this->hasMany(AttendanceCorrectionRequest::class);
+    }
 }

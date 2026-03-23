@@ -4,6 +4,9 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceListController;
+use App\Http\Controllers\AttendanceDetailController;
+use App\Http\Controllers\AttendanceCorrectionRequestController;
+use App\Http\Controllers\AttendanceCorrectionRequestListController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -38,4 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/attendance/break-end', [AttendanceController::class, 'endBreak'])->name('attendance.break-end');
     Route::post('/attendance/clock-out', [AttendanceController::class, 'clockOut'])->name('attendance.clock-out');
     Route::get('/attendance/list', [AttendanceListController::class, 'index'])->name('attendance.list');
+    Route::get('/attendance/detail/{id}', [AttendanceDetailController::class, 'show'])->name('attendance.show');
+    Route::post('/attendance/detail/{id}/request', [AttendanceCorrectionRequestController::class, 'store'])->name('attendance.correction_request.store');
+    Route::get('/attendance/requests', [AttendanceCorrectionRequestListController::class, 'index'])->name('attendance.requests');
 });
