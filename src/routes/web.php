@@ -7,6 +7,8 @@ use App\Http\Controllers\AttendanceListController;
 use App\Http\Controllers\AttendanceDetailController;
 use App\Http\Controllers\AttendanceCorrectionRequestController;
 use App\Http\Controllers\AttendanceCorrectionRequestListController;
+use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\AdminAttendanceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -44,4 +46,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/attendance/detail/{id}', [AttendanceDetailController::class, 'show'])->name('attendance.show');
     Route::post('/attendance/detail/{id}/request', [AttendanceCorrectionRequestController::class, 'store'])->name('attendance.correction_request.store');
     Route::get('/attendance/requests', [AttendanceCorrectionRequestListController::class, 'index'])->name('attendance.requests');
+});
+
+Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.post');
+Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+Route::middleware('admin')->group(function () {
+    Route::get('/admin/attendance/list', [AdminAttendanceController::class, 'index'])->name('admin.attendance.list');
 });

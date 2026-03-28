@@ -19,7 +19,13 @@
 
 <body>
     @php
-        $isAuthPage = request()->routeIs('login') || request()->routeIs('register') || request()->routeIs('verification.notice');
+        $isAuthPage =
+        request()->routeIs('login') ||
+        request()->routeIs('register') ||
+        request()->routeIs('verification.notice') ||
+        request()->routeIs('admin.login');
+
+        $isAdminPage = request()->routeIs('admin.*');
     @endphp
 
     <header class="header">
@@ -31,21 +37,39 @@
             @if (!$isAuthPage)
                 <nav class="header__nav" aria-label="グローバルナビゲーション">
                     <ul class="header__nav-list">
-                        <li class="header__nav-item">
-                            <a class="header__nav-link" href="{{ url('/attendance') }}">勤怠</a>
-                        </li>
-                        <li class="header__nav-item">
-                            <a class="header__nav-link" href="{{ url('/attendance/list') }}">勤怠一覧</a>
-                        </li>
-                        <li class="header__nav-item">
-                            <a class="header__nav-link" href="{{ route('attendance.requests') }}">申請</a>
-                        </li>
-                        <li class="header__nav-item">
-                            <form method="POST" action="{{ route('logout') }}">
+                        @if ($isAdminPage)
+                            <li class="header__nav-item">
+                                <a class="header__nav-link" href="{{ route('admin.attendance.list') }}">勤怠一覧</a>
+                            </li>
+                            <li class="header__nav-item">
+                                <a class="header__nav-link" href="#">スタッフ一覧</a>
+                            </li>
+                            <li class="header__nav-item">
+                                <a class="header__nav-link" href="#">申請一覧</a>
+                            </li>
+                            <li class="header__nav-item">
+                                <form method="POST" action="{{ route('admin.logout') }}">
+                                    @csrf
+                                    <button class="header__nav-button" type="submit">ログアウト</button>
+                                </form>
+                            </li>
+                        @else
+                            <li class="header__nav-item">
+                                <a class="header__nav-link" href="{{ url('/attendance') }}">勤怠</a>
+                            </li>
+                            <li class="header__nav-item">
+                                <a class="header__nav-link" href="{{ url('/attendance/list') }}">勤怠一覧</a>
+                            </li>
+                            <li class="header__nav-item">
+                                <a class="header__nav-link" href="{{ route('attendance.requests') }}">申請</a>
+                            </li>
+                            <li class="header__nav-item">
+                                <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button class="header__nav-button" type="submit">ログアウト</button>
-                            </form>
-                        </li>
+                                    <button class="header__nav-button" type="submit">ログアウト</button>
+                                </form>
+                            </li>
+                        @endif
                     </ul>
                 </nav>
             @endif
