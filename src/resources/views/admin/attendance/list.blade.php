@@ -44,7 +44,7 @@
                             <td>{{ $dailyAttendance['work_duration'] ? mb_convert_kana($dailyAttendance['work_duration'], 'A') : '' }}</td>
                             <td>
                                 @if (!empty($dailyAttendance['attendance_id']))
-                                    <a class="attendance-list-table__detail-link" href="{{ route('attendance.show', ['id' => $dailyAttendance['attendance_id']]) }}">詳細</a>
+                                    <a class="attendance-list-table__detail-link" href="{{ route('admin.attendance.show', ['id' => $dailyAttendance['attendance_id']]) }}">詳細</a>
                                 @endif
                             </td>
                         </tr>

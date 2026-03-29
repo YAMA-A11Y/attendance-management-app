@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AdminAttendanceUpdateRequest;
 use App\Models\Attendance;
+use App\Models\BreakTime;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminAttendanceController extends Controller
 {
@@ -70,6 +73,66 @@ class AdminAttendanceController extends Controller
             'previousDate' => $currentDateCarbon->copy()->subDay()->toDateString(),
             'nextDate' => $currentDateCarbon->copy()->addDay()->toDateString(),
             'attendanceList' => $attendanceList,
+        ]);
+    }
+
+    public function show($id)
+    {
+        $attendance = Attendance::with([
+            'user',
+            'breakTimes',
+            'correctionRequests.breakTimes',
+        ])->findOrFail($id);
+
+        $pendingCorrectionRequest = $attendance->correctionRequests
+            ->where('status', 'pending')
+            ->sortByDesc('created_at')
+            ->first();
+
+        return view('admin.attendance.show', compact('attendance', 'pendingCorrectionRequest'));
+    }
+
+    public function update(AdminAttendanceUpdateRequest $request, $id)
+    {
+        $attendance = Attendance::with('correctionRequests')->findOrFail($id);
+
+        $pendingCorrectionRequest = $attendance->correctionRequests
+            ->where('status', 'pending')
+            ->sortByDesc('created_at')
+            ->first();
+
+        if ($pendingCorrectionRequest) {
+            return redirect()->route('admin.attendance.show', ['id' => $attendance->id]);
+        }
+
+        DB::transaction(function () use ($request, $attendance) {
+            $attendance->clock_in_at = $request->input('clock_in_at');
+            $attendance->clock_out_at = $request->input('clock_out_at');
+            $attendance->remark = $request->input('remark');
+            $attendance->save();
+
+            BreakTime::where('attendance_id', $attendance->id)->delete();
+
+            $breakInputs = $request->input('breaks', []);
+
+            foreach ($breakInputs as $breakInput) {
+                $breakStartAt = $breakInput['break_start_at'] ?? null;
+                $breakEndAt = $breakInput['break_end_at'] ?? null;
+
+                if (!$breakStartAt && !$breakEndAt) {
+                    continue;
+                }
+
+                BreakTime::create([
+                'attendance_id' => $attendance->id,
+                'break_start_at' => $breakStartAt,
+                'break_end_at' => $breakEndAt,
+                ]);
+            }
+        });
+
+        return redirect()->route('admin.attendance.list', [
+            'date' => \Carbon\Carbon::parse($attendance->work_date)->toDateString(),
         ]);
     }
 }
