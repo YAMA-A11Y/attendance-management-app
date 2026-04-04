@@ -1,0 +1,165 @@
+.admin-staff-list-page {
+    min-height: calc(100vh - 80px);
+    background-color: #f1f1f1;
+    padding: 60px 20px 120px;
+}
+
+.admin-staff-list-page-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.admin-staff-list-page-title {
+    position: relative;
+    max-width: 980px;
+    margin: 0 auto 40px;
+    padding-left: 22px;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #000000;
+}
+
+.admin-staff-list-page-title::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 8px;
+    height: 36px;
+    background-color: #000000;
+    transform: translateY(-50%);
+}
+
+.admin-staff-list-table {
+    max-width: 980px;
+    margin: 0 auto;
+    overflow-x: auto;
+}
+
+.admin-staff-list-table__table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.admin-staff-list-table__heading {
+    padding: 16px 24px;
+    border-bottom: 2px solid #e5e5e5;
+    font-size: 14px;
+    font-weight: 700;
+    color: #6b7280;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.admin-staff-list-table__heading:nth-child(1) {
+    width: 28%;
+}
+
+.admin-staff-list-table__heading:nth-child(2) {
+    width: 44%;
+}
+
+.admin-staff-list-table__heading:nth-child(3) {
+    width: 28%;
+}
+
+.admin-staff-list-table__heading-text {
+    display: inline-block;
+}
+
+.admin-staff-list-table__heading-text--name {
+    transform: translateX(90px);
+}
+
+.admin-staff-list-table__heading-text--attendance {
+    transform: translateX(-110px);
+}
+
+.admin-staff-list-table__row {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.admin-staff-list-table__row:last-child {
+    border-bottom: none;
+}
+
+.admin-staff-list-table__data {
+    padding: 18px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #4b5563;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.admin-staff-list-table__data:nth-child(1) {
+    width: 28%;
+    text-align: right;
+    padding-right: 12px;
+}
+
+.admin-staff-list-table__data:nth-child(2) {
+    width: 44%;
+    text-align: center;
+}
+
+.admin-staff-list-table__data:nth-child(3) {
+    width: 28%;
+    text-align: left;
+    padding-left: 12px;
+}
+
+.admin-staff-list-table__detail-link {
+    color: #000000;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.admin-staff-list-table__detail-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 850px) {
+    .admin-staff-list-page {
+        padding: 50px 16px 80px;
+    }
+
+    .admin-staff-list-page-inner {
+        max-width: 100%;
+    }
+
+    .admin-staff-list-page-title {
+        max-width: 100%;
+        margin-bottom: 32px;
+        padding-left: 18px;
+        font-size: 24px;
+    }
+
+    .admin-staff-list-page-title::before {
+        width: 6px;
+        height: 28px;
+    }
+
+    .admin-staff-list-table {
+        max-width: 100%;
+    }
+
+    .admin-staff-list-table__heading,
+    .admin-staff-list-table__data {
+        padding: 14px 16px;
+        font-size: 13px;
+    }
+
+    .admin-staff-list-table__heading-text--name {
+        transform: translateX(16px);
+    }
+
+    .admin-staff-list-table__heading-text--attendance {
+        transform: translateX(-16px);
+    }
+}
