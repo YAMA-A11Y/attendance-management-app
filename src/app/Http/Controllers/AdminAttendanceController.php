@@ -76,7 +76,7 @@ class AdminAttendanceController extends Controller
         ]);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $attendance = Attendance::with([
             'user',

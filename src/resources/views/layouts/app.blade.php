@@ -39,7 +39,7 @@
                     <ul class="header__nav-list">
                         @if ($isAdminPage)
                             <li class="header__nav-item">
-                                <a class="header__nav-link" href="{{ route('admin.attendance.list') }}">勤怠一覧</a>
+                                <a class="header__nav-link" href="{{ request()->has('date') ? route('admin.attendance.list', ['date' => request('date')]) : route('admin.attendance.list') }}">勤怠一覧</a>
                             </li>
                             <li class="header__nav-item">
                                 <a class="header__nav-link" href="#">スタッフ一覧</a>
