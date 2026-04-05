@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminStaffAttendanceController extends Controller
 {
@@ -13,9 +14,69 @@ class AdminStaffAttendanceController extends Controller
     {
         $staffMember = User::findOrFail($id);
 
+        $currentMonth = $this->resolveCurrentMonth($request);
+        $attendanceList = $this->buildAttendanceList($staffMember, $currentMonth);
+
+        $displayMonth = $currentMonth->format('Y/m');
+        $currentMonthParam = $currentMonth->format('Y-m');
+        $previousMonth = $currentMonth->copy()->subMonth()->format('Y-m');
+        $nextMonth = $currentMonth->copy()->addMonth()->format('Y-m');
+
+        return view('admin.attendance.staff', compact(
+            'staffMember',
+            'attendanceList',
+            'displayMonth',
+            'currentMonthParam',
+            'previousMonth',
+            'nextMonth'
+        ));
+    }
+
+    public function exportCsv(Request $request, $id)
+    {
+        $staffMember = User::findOrFail($id);
+
+        $currentMonth = $this->resolveCurrentMonth($request);
+        $attendanceList = $this->buildAttendanceList($staffMember, $currentMonth);
+
+        $fileName = 'staff_' . $staffMember->id . '_' . $currentMonth->format('Y-m') . '.csv';
+
+        $response = new StreamedResponse(function () use ($attendanceList) {
+            $output = fopen('php://output', 'w');
+
+            fputcsv($output, [
+                mb_convert_encoding('日付', 'SJIS-win', 'UTF-8'),
+                mb_convert_encoding('出勤', 'SJIS-win', 'UTF-8'),
+                mb_convert_encoding('退勤', 'SJIS-win', 'UTF-8'),
+                mb_convert_encoding('休憩', 'SJIS-win', 'UTF-8'),
+                mb_convert_encoding('合計', 'SJIS-win', 'UTF-8'),
+            ]);
+
+            foreach ($attendanceList as $dailyAttendance) {
+                fputcsv($output, [
+                    mb_convert_encoding($dailyAttendance['date']->format('Y/m/d') . '(' . $dailyAttendance['date']->isoFormat('dd') . ')', 'SJIS-win', 'UTF-8'),
+                    mb_convert_encoding($dailyAttendance['clock_in_at'], 'SJIS-win', 'UTF-8'),
+                    mb_convert_encoding($dailyAttendance['clock_out_at'], 'SJIS-win', 'UTF-8'),
+                    mb_convert_encoding($dailyAttendance['break_duration'], 'SJIS-win', 'UTF-8'),
+                    mb_convert_encoding($dailyAttendance['work_duration'], 'SJIS-win', 'UTF-8'),
+                ]);
+            }
+            fclose($output);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv; charset=Shift_JIS');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+
+        return $response;
+    }
+
+    private function resolveCurrentMonth(Request $request) {
         $targetMonth = $request->input('month');
 
-        $currentMonth = $targetMonth ? Carbon::createFromFormat('Y-m', $targetMonth)->startOfMonth() : Carbon::today()->startOfMonth();
+        return $targetMonth ? Carbon::createFromFormat('Y-m', $targetMonth)->startOfMonth() : Carbon::today()->startOfMonth();
+    }
+
+    private function buildAttendanceList(User $staffMember, Carbon $currentMonth) {
 
         $startOfMonth = $currentMonth->copy()->startOfMonth();
         $endOfMonth = $currentMonth->copy()->endOfMonth();
@@ -65,7 +126,7 @@ class AdminStaffAttendanceController extends Controller
                     $breakDuration = sprintf('%d:%02d', $breakHours, $breakMinutes);
                 }
 
-                if ($attendance->clpck_in_at && $attendance->clock_out_at) {
+                if ($attendance->clock_in_at && $attendance->clock_out_at) {
                     $workMinutes = Carbon::parse($attendance->clock_in_at)->diffInMinutes(Carbon::parse($attendance->clock_out_at)) - $totalBreakMinutes;
 
                     if ($workMinutes > 0) {
@@ -87,17 +148,7 @@ class AdminStaffAttendanceController extends Controller
 
             $dateCursor->addDay();
         }
-
-        $displayMonth = $currentMonth->format('Y/m');
-        $previousMonth = $currentMonth->copy()->subMonth()->format('Y-m');
-        $nextMonth = $currentMonth->copy()->addMonth()->format('Y-m');
-
-        return view('admin.attendance.staff', compact(
-            'staffMember',
-            'attendanceList',
-            'displayMonth',
-            'previousMonth',
-            'nextMonth'
-        ));
+        
+        return $attendanceList;
     }
 }

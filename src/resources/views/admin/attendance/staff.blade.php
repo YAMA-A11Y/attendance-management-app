@@ -70,7 +70,7 @@
         </div>
 
         <div class="admin-staff-attendance-page__csv-button-wrapper">
-            <button class="admin-staff-attendance-page__csv-button" type="button">ＣＳＶ出力</button>
+            <a class="admin-staff-attendance-page__csv-button" href="{{ route('admin.attendance.staff.csv', ['id' => $staffMember->id, 'month' => $currentMonthParam]) }}" >ＣＳＶ出力</a>
         </div>
     </div>
 </div>

@@ -59,4 +59,5 @@ Route::middleware('admin')->group(function () {
     Route::post('/admin/attendance/{id}', [AdminAttendanceController::class, 'update'])->name('admin.attendance.update');
     Route::get('/admin/staff/list', [AdminStaffController::class, 'index'])->name('admin.staff.list');
     Route::get('/admin/attendance/staff/{id}', [AdminStaffAttendanceController::class, 'index'])->name('admin.attendance.staff');
+    Route::get('/admin/attendance/staff/{id}/csv', [AdminStaffAttendanceController::class, 'exportCsv'])->name('admin.attendance.staff.csv');
 });

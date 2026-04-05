@@ -146,6 +146,7 @@
 }
 
 .admin-staff-attendance-page__csv-button {
+    display: inline-block;
     min-width: 150px;
     padding: 12px 24px;
     border: none;
@@ -155,6 +156,8 @@
     font-size: 16px;
     font-weight: 700;
     line-height: 1;
+    text-align: center;
+    text-decoration: none;
     cursor: pointer;
 }
 
