@@ -45,7 +45,7 @@
                                 <a class="header__nav-link" href="{{ route('admin.staff.list') }}">スタッフ一覧</a>
                             </li>
                             <li class="header__nav-item">
-                                <a class="header__nav-link" href="#">申請一覧</a>
+                                <a class="header__nav-link" href="{{ route('admin.requests.index', ['status' => 'pending']) }}">申請一覧</a>
                             </li>
                             <li class="header__nav-item">
                                 <form method="POST" action="{{ route('admin.logout') }}">

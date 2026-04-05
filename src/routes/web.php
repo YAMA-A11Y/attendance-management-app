@@ -7,8 +7,9 @@ use App\Http\Controllers\AttendanceListController;
 use App\Http\Controllers\AttendanceDetailController;
 use App\Http\Controllers\AttendanceCorrectionRequestController;
 use App\Http\Controllers\AttendanceCorrectionRequestListController;
-use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminAttendanceController;
+use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\AdminCorrectionRequestController;
 use App\Http\Controllers\AdminStaffAttendanceController;
 use App\Http\Controllers\AdminStaffController;
 use Illuminate\Http\Request;
@@ -60,4 +61,7 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/staff/list', [AdminStaffController::class, 'index'])->name('admin.staff.list');
     Route::get('/admin/attendance/staff/{id}', [AdminStaffAttendanceController::class, 'index'])->name('admin.attendance.staff');
     Route::get('/admin/attendance/staff/{id}/csv', [AdminStaffAttendanceController::class, 'exportCsv'])->name('admin.attendance.staff.csv');
+    Route::get('/stamp_correction_request/list', [AdminCorrectionRequestController::class, 'index'])->name('admin.requests.index');
+    Route::get('/stamp_correction_request/{attendance_correction_request}', [AdminCorrectionRequestController::class, 'show'])
+    ->name('admin.requests.show');
 });
