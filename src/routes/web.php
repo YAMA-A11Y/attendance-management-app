@@ -62,6 +62,6 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/attendance/staff/{id}', [AdminStaffAttendanceController::class, 'index'])->name('admin.attendance.staff');
     Route::get('/admin/attendance/staff/{id}/csv', [AdminStaffAttendanceController::class, 'exportCsv'])->name('admin.attendance.staff.csv');
     Route::get('/stamp_correction_request/list', [AdminCorrectionRequestController::class, 'index'])->name('admin.requests.index');
-    Route::get('/stamp_correction_request/{attendance_correction_request}', [AdminCorrectionRequestController::class, 'show'])
-    ->name('admin.requests.show');
+    Route::get('/stamp_correction_request/approve/{attendanceCorrectionRequest}', [AdminCorrectionRequestController::class, 'show'])->name('admin.requests.show');
+    Route::post('/stamp_correction_request/approve/{attendanceCorrectionRequest}', [AdminCorrectionRequestController::class, 'approve']) ->name('admin.requests.approve');
 });

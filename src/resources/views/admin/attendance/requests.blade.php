@@ -40,7 +40,7 @@
                                 <td class="admin-requests-table__remark">{{ $correctionRequest->remark }}</td>
                                 <td>{{ optional($correctionRequest->created_at)->format('Y/m/d') }}</td>
                                 <td>
-                                    <a class="admin-requests-table__detail-link" href="#">詳細</a>
+                                    <a class="admin-requests-table__detail-link" href="{{ route('admin.requests.show', ['attendanceCorrectionRequest' => $correctionRequest->id]) }}">詳細</a>
                                 </td>
                             </tr>
                         @empty

@@ -10,8 +10,8 @@
         <h1 class="attendance-requests-page__title">申請一覧</h1>
 
         <div class="attendance-requests-tabs">
-            <a href="#" class="attendance-requests-tabs__item is-active">承認待ち</a>
-            <a href="#" class="attendance-requests-tabs__item">承認済み</a>
+            <a class="attendance-requests-tabs__item {{ $currentStatus === 'pending' ? 'is-active' : '' }}" href="{{ route('attendance.requests', ['status' => 'pending']) }}">承認待ち</a>
+            <a class="attendance-requests-tabs__item {{ $currentStatus === 'approved' ? 'is-active' : '' }}" href="{{ route('attendance.requests', ['status' => 'approved']) }}">承認済み</a>
         </div>
 
         <section class="attendance-requests-card">
@@ -45,7 +45,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="attendance-requests-table__empty">承認待ちの申請はありません。</td>
+                                <td colspan="6" class="attendance-requests-table__empty">{{ $currentStatus === 'approved' ? '承認済みの申請はありません。' : '承認待ちの申請はありません。' }}</td>
                             </tr>
                         @endforelse
                     </tbody>

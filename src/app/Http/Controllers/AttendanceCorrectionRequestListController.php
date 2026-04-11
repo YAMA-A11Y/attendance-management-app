@@ -9,12 +9,14 @@ class AttendanceCorrectionRequestListController extends Controller
 {
     public function index()
     {
-        $requests = AttendanceCorrectionRequest::with(['attendance', 'user'])
+        $currentStatus = request('status', 'pending');
+
+        $correctionRequests = AttendanceCorrectionRequest::with(['attendance', 'user'])
             ->where('user_id', Auth::id())
-            ->where('status', 'pending')
+            ->where('status', $currentStatus)
             ->latest()
             ->get();
 
-        return view('attendance.requests', ['correctionRequests' => $requests,]);
+        return view('attendance.requests', compact('correctionRequests', 'currentStatus'));
     }
 }
