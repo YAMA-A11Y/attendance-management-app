@@ -18,6 +18,13 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route(('attendance.index')));
+        /** @var User $user */
+        $user = Auth::user();
+
+        if (!$user->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice');
+        }
+
+        return redirect()->intended(route('attendance.index'));
     }
 }
