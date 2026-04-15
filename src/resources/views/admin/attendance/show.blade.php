@@ -105,9 +105,15 @@
                 </div>
             </div>
 
-            <div class="attendance-detail-button-area">
-                <button class="attendance-detail-button" type="submit" >修正</button>
-            </div>
+            @if ($pendingCorrectionRequest)
+                <p class="attendance-detail-pending-message">
+                    *承認待ちのため修正はできません。
+                </p>
+            @else
+                <div class="attendance-detail-button-area">
+                    <button class="attendance-detail-button" type="submit" >修正</button>
+                </div>
+            @endif
         </form>
     </div>
 </div>
