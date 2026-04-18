@@ -9,7 +9,7 @@ class RegisterTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function validPayload(array $overrides = []): array
+    private function validPayload(array $overrides = []): array
     {
         return array_merge([
             'name' => 'テスト太郎',
