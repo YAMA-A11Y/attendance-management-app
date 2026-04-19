@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -38,7 +37,7 @@ class AttendanceCorrectionRequest extends FormRequest
     public function messages()
     {
         return [
-            'remark.required' => '備考を記入してください'
+            'remark.required' => '備考を記入してください',
         ];
     }
 
@@ -71,7 +70,7 @@ class AttendanceCorrectionRequest extends FormRequest
                     $clockIn = Carbon::createFromFormat('H:i', $clockInAt);
 
                     if ($breakStart->lt($clockIn)) {
-                        $validator->errors()->add('breaks' . $index . 'break_start_at', '休憩時間が不適切な値です');
+                        $validator->errors()->add("breaks.$index.break_start_at", '休憩時間が不適切な値です');
                     }
                 }
 
@@ -80,7 +79,7 @@ class AttendanceCorrectionRequest extends FormRequest
                     $clockOut = Carbon::createFromFormat('H:i', $clockOutAt);
 
                     if ($breakStart->gt($clockOut)) {
-                        $validator->errors()->add('breaks' . $index . 'break_start_at', '休憩時間が不適切な値です');
+                        $validator->errors()->add("breaks.$index.break_start_at", '休憩時間が不適切な値です');
                     }
                 }
 
@@ -89,7 +88,7 @@ class AttendanceCorrectionRequest extends FormRequest
                     $clockOut = Carbon::createFromFormat('H:i', $clockOutAt);
 
                     if ($breakEnd->gt($clockOut)) {
-                        $validator->errors()->add('breaks' . $index . 'break_end_at', '休憩時間もしくは退勤時間が不適切な値です');
+                        $validator->errors()->add("breaks.$index.break_end_at", '休憩時間もしくは退勤時間が不適切な値です');
                     }
                 }
             }
