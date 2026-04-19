@@ -210,4 +210,214 @@ class AttendanceTest extends TestCase
 
         Carbon::setTestNow();
     }
+
+    public function test_user_can_start_break()
+    {
+        Carbon::setTestNow(Carbon::parse('2026-04-18 12:00:00'));
+
+        /** @var \App\Models\User $user */
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        Attendance::create([
+            'user_id' => $user->id,
+            'work_date' => Carbon::now()->toDateString(),
+            'clock_in_at' => Carbon::now()->copy()->setTime(9, 0),
+            'status' => Attendance::STATUS_WORKING,
+        ]);
+
+        $this->actingAs($user);
+
+        $beforeResponse = $this->get(route('attendance.index'));
+        $breakStartResponse = $this->post(route('attendance.break-start'));
+        $afterResponse = $this->get(route('attendance.index'));
+
+        $beforeResponse->assertStatus(200);
+        $beforeResponse->assertSee('休憩入');
+        
+        $breakStartResponse->assertRedirect(route('attendance.index'));
+
+        $afterResponse->assertStatus(200);
+        $afterResponse->assertSee('休憩中');
+
+        $this->assertDatabaseHas('break_times', [
+            'attendance_id' => Attendance::first()->id,
+            'break_start_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'break_end_at' => null,
+        ]);
+
+        Carbon::setTestNow();
+    }
+
+    public function test_user_can_start_break_multiple_times_in_one_day()
+    {
+        Carbon::setTestNow(Carbon::parse('2026-04-18 12:00:00'));
+
+        /** @var \App\Models\User $user */
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        $attendance = Attendance::create([
+            'user_id' => $user->id,
+            'work_date' => Carbon::now()->toDateString(),
+            'clock_in_at' => Carbon::now()->copy()->setTime(9, 0),
+            'status' => Attendance::STATUS_WORKING,
+        ]);
+
+        BreakTime::create([
+            'attendance_id' => $attendance->id,
+            'break_start_at' => Carbon::now()->copy()->setTime(10, 0),
+            'break_end_at' => Carbon::now()->copy()->setTime(10, 15),
+        ]);
+
+        $this->actingAs($user);
+
+        $response = $this->post(route('attendance.break-start'));
+        $afterResponse = $this->get(route('attendance.index'));
+
+        $response->assertRedirect(route('attendance.index'));
+        $afterResponse->assertStatus(200);
+        $afterResponse->assertSee('休憩中'); 
+
+        $this->assertDatabaseHas('break_times', [
+            'attendance_id' => $attendance->id,
+            'break_start_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'break_end_at' => null,
+        ]);
+
+        $this->assertSame(2, BreakTime::where('attendance_id', $attendance->id)->count());
+
+        Carbon::setTestNow();
+    }
+
+    public function test_user_can_end_break()
+    {
+        Carbon::setTestNow(Carbon::parse('2026-04-18 12:30:00'));
+
+        /** @var \App\Models\User $user */
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        $attendance = Attendance::create([
+            'user_id' => $user->id,
+            'work_date' => Carbon::now()->toDateString(),
+            'clock_in_at' => Carbon::now()->copy()->setTime(9, 0),
+            'status' => Attendance::STATUS_ON_BREAK,
+        ]);
+
+        BreakTime::create([
+            'attendance_id' => $attendance->id,
+            'break_start_at' => Carbon::now()->copy()->setTime(12, 0),
+            'break_end_at' => null,
+        ]);
+
+        $this->actingAs($user);
+
+        $beforeResponse = $this->get(route('attendance.index'));
+        $breakEndResponse = $this->post(route('attendance.break-end'));
+        $afterResponse = $this->get(route('attendance.index'));
+
+        $beforeResponse->assertStatus(200);
+        $beforeResponse->assertSee('休憩戻');
+        
+        $breakEndResponse->assertRedirect(route('attendance.index'));
+
+        $afterResponse->assertStatus(200);
+        $afterResponse->assertSee('出勤中');
+
+        $this->assertDatabaseHas('break_times', [
+            'attendance_id' => $attendance->id,
+            'break_start_at' => Carbon::now()->copy()->setTime(12, 0)->format('Y-m-d H:i:s'),
+            'break_end_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+
+        Carbon::setTestNow();
+    }
+
+    public function test_user_can_end_break_multiple_times_in_one_day()
+    {
+        Carbon::setTestNow(Carbon::parse('2026-04-18 15:00:00'));
+
+        /** @var \App\Models\User $user */
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        $attendance = Attendance::create([
+            'user_id' => $user->id,
+            'work_date' => Carbon::now()->toDateString(),
+            'clock_in_at' => Carbon::now()->copy()->setTime(9, 0),
+            'status' => Attendance::STATUS_ON_BREAK,
+        ]);
+
+        BreakTime::create([
+            'attendance_id' => $attendance->id,
+            'break_start_at' => Carbon::now()->copy()->setTime(10, 0),
+            'break_end_at' => Carbon::now()->copy()->setTime(10, 15),
+        ]);
+
+        BreakTime::create([
+            'attendance_id' => $attendance->id,
+            'break_start_at' => Carbon::now()->copy()->setTime(14, 30),
+            'break_end_at' => null,
+        ]);
+
+        $this->actingAs($user);
+
+        $response = $this->post(route('attendance.break-end'));
+        $afterResponse = $this->get(route('attendance.index'));
+
+        $response->assertRedirect(route('attendance.index'));
+        $afterResponse->assertStatus(200);
+        $afterResponse->assertSee('出勤中'); 
+
+        $this->assertDatabaseHas('break_times', [
+            'attendance_id' => $attendance->id,
+            'break_start_at' => Carbon::now()->copy()->setTime(14, 30)->format('Y-m-d H:i:s'),
+            'break_end_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+
+        $this->assertSame(2, BreakTime::where('attendance_id', $attendance->id)->count());
+
+        Carbon::setTestNow();
+    }
+
+    public function test_break_time_is_displayed_in_attendance_list()
+    {
+        Carbon::setTestNow(Carbon::parse('2026-04-18 12:30:00'));
+
+        /** @var \App\Models\User $user */
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        $attendance = Attendance::create([
+            'user_id' => $user->id,
+            'work_date' => Carbon::now()->toDateString(),
+            'clock_in_at' => Carbon::now()->copy()->setTime(9, 0),
+            'status' => Attendance::STATUS_WORKING,
+        ]);
+
+        BreakTime::create([
+            'attendance_id' => $attendance->id,
+            'break_start_at' => Carbon::now()->copy()->setTime(12, 0),
+            'break_end_at' => Carbon::now()->copy()->setTime(12, 30),
+        ]);
+
+        $response = $this->actingAs($user)->get(route('attendance.list'));
+
+        $response->assertStatus(200);
+        $response->assertSee('００：３０');
+
+        $this->assertDatabaseHas('break_times', [
+            'attendance_id' => $attendance->id,
+            'break_start_at' => '2026-04-18 12:00:00',
+            'break_end_at' => '2026-04-18 12:30:00',
+        ]);
+
+        Carbon::setTestNow();
+    }
 }
