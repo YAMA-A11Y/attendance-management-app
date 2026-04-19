@@ -74,7 +74,7 @@ class AttendanceTest extends TestCase
 
     public function test_status_is_on_break()
     {
-        Carbon::setTestNow(Carbon::parse('2026-04-18 09:05:00'));
+        Carbon::setTestNow(Carbon::parse('2026-04-18 12:30:00'));
 
         /** @var \App\Models\User $user */
         $user = User::factory()->create([
@@ -84,7 +84,7 @@ class AttendanceTest extends TestCase
         $attendance = Attendance::create([
             'user_id' => $user->id,
             'work_date' => Carbon::now()->toDateString(),
-            'clock_in_at' => Carbon::now()->copy()->setTime(9,0),
+            'clock_in_at' => Carbon::now()->copy()->setTime(9, 0),
             'status' => Attendance::STATUS_ON_BREAK,
         ]);
 
@@ -104,7 +104,7 @@ class AttendanceTest extends TestCase
 
     public function test_status_is_finished()
     {
-        Carbon::setTestNow(Carbon::parse('2026-04-18 09:05:00'));
+        Carbon::setTestNow(Carbon::parse('2026-04-18 18:05:00'));
 
         /** @var \App\Models\User $user */
         $user = User::factory()->create([
@@ -114,7 +114,7 @@ class AttendanceTest extends TestCase
         Attendance::create([
             'user_id' => $user->id,
             'work_date' => Carbon::now()->toDateString(),
-            'clock_in_at' => Carbon::now()->copy()->setTime(9,0),
+            'clock_in_at' => Carbon::now()->copy()->setTime(9, 0),
             'clock_out_at' => Carbon::now(),
             'status' => Attendance::STATUS_FINISHED,
         ]);
@@ -123,6 +123,90 @@ class AttendanceTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('退勤済');
+
+        Carbon::setTestNow();
+    }
+
+    public function test_user_can_clock_in()
+    {               
+        Carbon::setTestNow(Carbon::parse('2026-04-18 09:05:00'));
+
+        /** @var \App\Models\User $user */
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        $this->actingAs($user);
+
+        $beforeResponse = $this->get(route('attendance.index'));
+        $clockInResponse = $this->post(route('attendance.clock-in'));
+        $afterResponse = $this->get(route('attendance.index'));
+
+        $beforeResponse->assertStatus(200);
+        $beforeResponse->assertSee('出勤');
+        
+        $clockInResponse->assertRedirect(route('attendance.index'));
+
+        $afterResponse->assertStatus(200);
+        $afterResponse->assertSee('出勤中');
+
+        $this->assertDatabaseHas('attendances', [
+            'user_id' => $user->id,
+            'work_date' => Carbon::now()->toDateString(),
+            'status' => Attendance::STATUS_WORKING,
+        ]);
+
+        Carbon::setTestNow();
+    }
+
+    public function test_user_cannot_clock_in_twice_in_one_day()
+    {
+        Carbon::setTestNow(Carbon::parse('2026-04-18 18:05:00'));
+
+        /** @var \App\Models\User $user */
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        Attendance::create([
+            'user_id' => $user->id,
+            'work_date' => Carbon::now()->toDateString(),
+            'clock_in_at' => Carbon::now()->copy()->setTime(9, 0),
+            'clock_out_at' => Carbon::now(),
+            'status' => Attendance::STATUS_FINISHED,
+        ]);
+
+        $response = $this->actingAs($user)->get(route('attendance.index'));
+
+        $response->assertStatus(200);
+        $response->assertDontSee('出勤');
+        $response->assertSee('退勤済');
+
+        Carbon::setTestNow();
+    }
+
+    public function test_clock_in_time_is_displayed_in_attendance_list()
+    {               
+        Carbon::setTestNow(Carbon::parse('2026-04-18 09:05:00'));
+
+        /** @var \App\Models\User $user */
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        $this->actingAs($user);
+        $this->post(route('attendance.clock-in'));
+
+        $response = $this->get(route('attendance.list'));
+
+        $response->assertStatus(200);
+        $response->assertSee('出勤');
+        
+        $this->assertDatabaseHas('attendances', [
+            'user_id' => $user->id,
+            'work_date' => Carbon::now()->toDateString(),
+            'clock_in_at' => Carbon::now()->format('Y-m-d H:i:s')
+        ]);
 
         Carbon::setTestNow();
     }
