@@ -112,27 +112,42 @@ class AdminStaffAttendanceController extends Controller
                 $clockInAt = $attendance->clock_in_at ? Carbon::parse($attendance->clock_in_at)->format('H:i') : '';
                 $clockOutAt = $attendance->clock_out_at ? Carbon::parse($attendance->clock_out_at)->format('H:i') : '';
 
-                $totalBreakMinutes = $attendance->breakTimes->sum(function ($breakTime) {
-                    if (!$breakTime->break_started_at || !$breakTime->break_ended_at) {
-                        return 0;
+                $totalBreakMinutes = 0;
+
+                foreach ($attendance->breakTimes as $breakTime) {
+                    if (!$breakTime->break_start_at || !$breakTime->break_end_at) {
+                        continue;
                     }
 
-                    return Carbon::parse($breakTime->break_started_at)->diffInMinutes(Carbon::parse($breakTime->break_ended_at));
-                });
+                    $breakStart = Carbon::createFromFormat(
+                        'H:i',
+                        Carbon::parse($breakTime->break_start_at)->format('H:i')
+                    );
+
+                    $breakEnd = Carbon::createFromFormat(
+                        'H:i',
+                        Carbon::parse($breakTime->break_end_at)->format('H:i')
+                    );
+
+                    $totalBreakMinutes += $breakStart->diffInMinutes($breakEnd);
+                }
 
                 if ($totalBreakMinutes > 0) {
                     $breakHours = floor($totalBreakMinutes / 60);
                     $breakMinutes = $totalBreakMinutes % 60;
-                    $breakDuration = sprintf('%d:%02d', $breakHours, $breakMinutes);
+                    $breakDuration = sprintf('%02d:%02d', $breakHours, $breakMinutes);
                 }
 
-                if ($attendance->clock_in_at && $attendance->clock_out_at) {
-                    $workMinutes = Carbon::parse($attendance->clock_in_at)->diffInMinutes(Carbon::parse($attendance->clock_out_at)) - $totalBreakMinutes;
+                if ($clockInAt && $clockOutAt) {
+                    $clockIn = Carbon::createFromFormat('H:i', $clockInAt);
+                    $clockOut = Carbon::createFromFormat('H:i', $clockOutAt);
+
+                    $workMinutes = $clockIn->diffInMinutes($clockOut) - $totalBreakMinutes;
 
                     if ($workMinutes > 0) {
                         $workHours = floor($workMinutes / 60);
                         $remainingMinutes = $workMinutes % 60;
-                        $workDuration = sprintf('%d:%02d', $workHours, $remainingMinutes);
+                        $workDuration = sprintf('%02d:%02d', $workHours, $remainingMinutes);
                     }
                 }
             }
