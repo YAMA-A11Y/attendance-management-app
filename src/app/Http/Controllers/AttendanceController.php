@@ -35,7 +35,7 @@ class AttendanceController extends Controller
         
         $statusLabels = [
             Attendance::STATUS_BEFORE_WORK => '勤務外',
-            Attendance::STATUS_WORKING => '出勤中',
+            Attendance::STATUS_WORKING => '勤務中',
             Attendance::STATUS_ON_BREAK => '休憩中',
             Attendance::STATUS_FINISHED => '退勤済',
         ];

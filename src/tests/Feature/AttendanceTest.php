@@ -67,7 +67,7 @@ class AttendanceTest extends TestCase
         $response = $this->actingAs($user)->get(route('attendance.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('出勤中');
+        $response->assertSee('勤務中');
 
         Carbon::setTestNow();
     }
@@ -148,7 +148,7 @@ class AttendanceTest extends TestCase
         $clockInResponse->assertRedirect(route('attendance.index'));
 
         $afterResponse->assertStatus(200);
-        $afterResponse->assertSee('出勤中');
+        $afterResponse->assertSee('勤務中');
 
         $this->assertDatabaseHas('attendances', [
             'user_id' => $user->id,
@@ -326,7 +326,7 @@ class AttendanceTest extends TestCase
         $breakEndResponse->assertRedirect(route('attendance.index'));
 
         $afterResponse->assertStatus(200);
-        $afterResponse->assertSee('出勤中');
+        $afterResponse->assertSee('勤務中');
 
         $this->assertDatabaseHas('break_times', [
             'attendance_id' => $attendance->id,
@@ -372,7 +372,7 @@ class AttendanceTest extends TestCase
 
         $response->assertRedirect(route('attendance.index'));
         $afterResponse->assertStatus(200);
-        $afterResponse->assertSee('出勤中'); 
+        $afterResponse->assertSee('勤務中'); 
 
         $this->assertDatabaseHas('break_times', [
             'attendance_id' => $attendance->id,
