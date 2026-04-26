@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Attendance;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -53,7 +54,19 @@ class AttendanceCorrectionRequest extends FormRequest
                 $clockOut = Carbon::createFromFormat('H:i', $clockOutAt);
 
                 if ($clockIn->gt($clockOut)) {
-                    $validator->errors()->add('clock_in_at', '出勤時間もしくは退勤時間が不適切な値です');
+                    $attendance = Attendance::find($this->route('id'));
+
+                    $originalClockInAt = $attendance ? $this->formatTime($attendance->clock_in_at) : null;
+                    $originalClockOutAt = $attendance ? $this->formatTime($attendance->clock_out_at) : null;
+
+                    $isClockInChanged = $clockInAt !== $originalClockInAt;
+                    $isClockOutChanged = $clockOutAt !== $originalClockOutAt;
+
+                    if (!$isClockInChanged && $isClockOutChanged) {
+                        $validator->errors()->add('clock_out_at', '退勤時間が不適切な値です');
+                    } else {
+                        $validator->errors()->add('clock_in_at', '出勤時間が不適切な値です');
+                    }
                 }
             }
 
@@ -93,5 +106,18 @@ class AttendanceCorrectionRequest extends FormRequest
                 }
             }
         });
+    }
+
+    private function formatTime($time)
+    {
+        if (!$time) {
+            return null;
+        }
+
+        if ($time instanceof Carbon) {
+            return $time->format('H:i');
+        }
+
+        return Carbon::parse($time)->format('H:i');
     }
 }

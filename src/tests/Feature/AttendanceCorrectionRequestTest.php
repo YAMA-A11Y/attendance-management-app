@@ -57,7 +57,7 @@ class AttendanceCorrectionRequestTest extends TestCase
             'id' => $attendance->id,
         ]));
         $response->assertSessionHasErrors([
-            'clock_in_at' => '出勤時間もしくは退勤時間が不適切な値です',
+            'clock_in_at' => '出勤時間が不適切な値です',
         ]);
     }
 
