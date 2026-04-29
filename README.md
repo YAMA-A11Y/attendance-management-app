@@ -104,16 +104,40 @@ MAIL_FROM_ADDRESS=test@example.com
 本アプリでは PHPUnit による Feature テストを実装しています。
 
 テスト実行時は `.env.testing` を使用します。  
-`.env.testing` では、テスト用データベースとして `demo_test` を使用しています。
+クローン直後は `.env.testing` が存在しないため、以下の手順で作成してください。
+
+### .env.testing の作成
+
+PHP コンテナ内で、`.env.example` をコピーして `.env.testing` を作成します。
+
+```bash
+docker compose exec php cp .env.example .env.testing
+```
+
+作成後、`.env.testing` の以下の項目をテスト用に変更してください。
 
 ```env
+APP_ENV=testing
+
 DB_CONNECTION=mysql
 DB_HOST=mysql
 DB_PORT=3306
 DB_DATABASE=demo_test
 DB_USERNAME=laravel_user
 DB_PASSWORD=laravel_pass
+
+CACHE_DRIVER=array
+SESSION_DRIVER=array
+MAIL_MAILER=array
 ```
+
+テスト用のアプリケーションキーを生成します。
+
+```bash
+docker compose exec php php artisan key:generate --env=testing
+```
+
+---
 
 ### テスト用データベースの作成
 
@@ -138,11 +162,17 @@ FLUSH PRIVILEGES;
 EXIT;
 ```
 
+---
+
 ### テスト用マイグレーション
+
+`.env.testing` が作成され、テスト用データベース `demo_test` が存在する状態で以下を実行してください。
 
 ```bash
 docker compose exec php php artisan migrate:fresh --env=testing
 ```
+
+---
 
 ### PHPUnit 実行
 
