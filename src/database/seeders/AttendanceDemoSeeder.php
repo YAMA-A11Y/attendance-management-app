@@ -13,9 +13,9 @@ class AttendanceDemoSeeder extends Seeder
     public function run()
     {
         $users = [
-            ['name' => '山田 太郎', 'email' => 'user1@example.com'],
-            ['name' => '佐藤 花子', 'email' => 'user2@example.com'],
-            ['name' => '鈴木 一郎', 'email' => 'user3@example.com'],
+            ['name' => '山田　太郎', 'email' => 'user1@example.com'],
+            ['name' => '佐藤　花子', 'email' => 'user2@example.com'],
+            ['name' => '鈴木　一郎', 'email' => 'user3@example.com'],
         ];
 
         foreach ($users as $userData) {
