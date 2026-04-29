@@ -73,7 +73,7 @@
                 <div class="attendance-detail-row">
                     <div class="attendance-detail-row__label">出勤・退勤</div>
                     <div class="attendance-detail-row__value attendance-detail-row__value--time-range">
-                        <input class="attendance-detail-time-input" type="time" name="clock_in_at" class="attendance-detail-time-input" value="{{ $displayClockInAt }}">
+                        <input class="attendance-detail-time-input" type="time" name="clock_in_at" value="{{ $displayClockInAt }}">
                         <span class="attendance-detail-time-separator">〜</span>
                         <input class="attendance-detail-time-input" type="time" name="clock_out_at" value="{{ $displayClockOutAt }}">
                     </div>
@@ -100,7 +100,7 @@
                 <div class="attendance-detail-row attendance-detail-row--textarea">
                     <div class="attendance-detail-row__label">備考</div>
                     <div class="attendance-detail-row__value">
-                        <textarea class="attendance-detail-remark-textarea"    name="remark">{{ $displayRemark }}</textarea>
+                        <textarea class="attendance-detail-remark-textarea" name="remark">{{ $displayRemark }}</textarea>
                     </div>
                 </div>
             </div>
@@ -111,7 +111,7 @@
                 </p>
             @else
                 <div class="attendance-detail-button-area">
-                    <button class="attendance-detail-button" type="submit" >修正</button>
+                    <button class="attendance-detail-button" type="submit">修正</button>
                 </div>
             @endif
         </form>

@@ -10,8 +10,8 @@
         <h1 class="attendance-requests-page__title">申請一覧</h1>
 
         <div class="attendance-requests-tabs">
-            <a class="attendance-requests-tabs__item {{ $currentStatus === 'pending' ? 'is-active' : '' }}" href="{{ route('attendance.requests', ['status' => 'pending']) }}">承認待ち</a>
-            <a class="attendance-requests-tabs__item {{ $currentStatus === 'approved' ? 'is-active' : '' }}" href="{{ route('attendance.requests', ['status' => 'approved']) }}">承認済み</a>
+            <a class="attendance-requests-tabs__item {{ $currentStatus === 'pending' ? 'is-active' : '' }}" href="{{ route('admin.requests.index', ['status' => 'pending']) }}">承認待ち</a>
+            <a class="attendance-requests-tabs__item {{ $currentStatus === 'approved' ? 'is-active' : '' }}" href="{{ route('admin.requests.index', ['status' => 'approved']) }}">承認済み</a>
         </div>
 
         <section class="attendance-requests-card">

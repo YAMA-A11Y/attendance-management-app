@@ -7,7 +7,7 @@
 1. リポジトリをクローンする。
 
 ```bash
-git clone git@github.com:ユーザー名/リポジトリ名.git
+git clone git@github.com:YAMA-A11Y/attendance-management-app.git
 ```
 
 2. プロジェクトディレクトリに移動する。
@@ -245,9 +245,9 @@ docker compose exec php vendor/bin/phpunit
 
 | 名前 | メールアドレス | パスワード |
 | --- | --- | --- |
-| 山田 太郎 | user1@example.com | password |
-| 佐藤 花子 | user2@example.com | password |
-| 鈴木 一郎 | user3@example.com | password |
+| 山田　太郎 | user1@example.com | password |
+| 佐藤　花子 | user2@example.com | password |
+| 鈴木　一郎 | user3@example.com | password |
 
 ※ 一般ユーザーはメール認証済みの状態で作成されます。
 

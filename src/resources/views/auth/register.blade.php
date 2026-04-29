@@ -46,7 +46,6 @@
                     <button class="auth-form__submit" type="submit">登録する</button>
                 </div>
             </form>
-
             
             <div class="auth__link">
                 <a href="{{ route('login') }}">ログインはこちらから</a>
