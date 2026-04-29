@@ -281,7 +281,7 @@ docker compose exec php vendor/bin/phpunit
 | 勤怠登録 | http://localhost/attendance |
 | 勤怠一覧 | http://localhost/attendance/list |
 | 勤怠詳細 | http://localhost/attendance/detail/{id} |
-| 申請一覧 | http://localhost/attendance/requests |
+| 申請一覧 | http://localhost/stamp_correction_request/list |
 
 ### 管理者
 
